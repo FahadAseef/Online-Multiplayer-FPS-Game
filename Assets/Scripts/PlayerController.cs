@@ -159,6 +159,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 Debug.Log(Hit.collider.gameObject.GetPhotonView().Owner.NickName);
                 PhotonNetwork.Instantiate(PlayerHitImpact.name, Hit.point, Quaternion.identity);
+                Hit.collider.gameObject.GetPhotonView().RPC("DealDamage",RpcTarget.All,photonView.Owner.NickName);
             }
             else
             {
@@ -238,6 +239,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 Cursor.lockState= CursorLockMode.Locked;
             }
         }
+    }
+
+    [PunRPC]
+    public void DealDamage(string damger)
+    {
+        Debug.Log("i have been hit"+damger);
     }
 
 }
