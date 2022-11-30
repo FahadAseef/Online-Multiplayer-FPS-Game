@@ -3688,6 +3688,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0b91dd02b4dad5e4e9c023c58f82d6a6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1502877291743220047, guid: 0b91dd02b4dad5e4e9c023c58f82d6a6, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -5807,6 +5811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 2848073980658438135, guid: 84033b2010bd1ad429c1948db3154eaa, type: 3}
+  DeathEffect: {fileID: 8606487361716073698, guid: 58e3275ae1e8d0e41b9587d6e8af1ff7, type: 3}
 --- !u!4 &2045156941
 Transform:
   m_ObjectHideFlags: 0

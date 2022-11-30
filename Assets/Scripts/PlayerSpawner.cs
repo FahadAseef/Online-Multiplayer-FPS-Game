@@ -8,6 +8,7 @@ public class PlayerSpawner : MonoBehaviour
     public static PlayerSpawner Instance;
     public GameObject PlayerPrefab;
     private GameObject Player;
+    public GameObject DeathEffect;
 
     private void Awake()
     {
@@ -26,6 +27,13 @@ public class PlayerSpawner : MonoBehaviour
     {
         Transform SpawnPoint = SpawnManager.instance.GetSpawnPoints();
         Player = PhotonNetwork.Instantiate(PlayerPrefab.name, SpawnPoint.position, SpawnPoint.rotation);
+    }
+
+    public void DieFN()
+    {
+        PhotonNetwork.Instantiate(DeathEffect.name,Player.transform.position,Quaternion.identity);
+        PhotonNetwork.Destroy(Player);
+        SpawnPlayerFN();
     }
 
 }
