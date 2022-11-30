@@ -9,6 +9,7 @@ public class PlayerSpawner : MonoBehaviour
     public GameObject PlayerPrefab;
     private GameObject Player;
     public GameObject DeathEffect;
+    [SerializeField] float RespawnTime=3f;
 
     private void Awake()
     {
@@ -29,11 +30,25 @@ public class PlayerSpawner : MonoBehaviour
         Player = PhotonNetwork.Instantiate(PlayerPrefab.name, SpawnPoint.position, SpawnPoint.rotation);
     }
 
-    public void DieFN()
+    public void DieFN(string Damager)
+    {       
+        UIcontroller.instance.DeathText.text = "You were killed by " + Damager;
+        if (Player != null)
+        {
+            StartCoroutine(DieCo());
+        }
+        //PhotonNetwork.Destroy(Player);
+        //SpawnPlayerFN();
+    }
+
+    public IEnumerator DieCo()
     {
-        PhotonNetwork.Instantiate(DeathEffect.name,Player.transform.position,Quaternion.identity);
+        PhotonNetwork.Instantiate(DeathEffect.name, Player.transform.position, Quaternion.identity);
         PhotonNetwork.Destroy(Player);
+        UIcontroller.instance.DeathPanel.SetActive(true);
+        yield return new WaitForSeconds(RespawnTime);
         SpawnPlayerFN();
+        UIcontroller.instance.DeathPanel.SetActive(false);
     }
 
 }

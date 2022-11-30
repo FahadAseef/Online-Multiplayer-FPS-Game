@@ -9,6 +9,8 @@ public class UIcontroller : MonoBehaviour
     public static UIcontroller instance;
     public TMP_Text OverheatMessagte;
     public Slider WeaponTempSlider;
+    public GameObject DeathPanel;
+    public TMP_Text DeathText;
 
     private void Awake()
     {
@@ -17,6 +19,7 @@ public class UIcontroller : MonoBehaviour
     private void Start()
     {
         OverheatMessagte.gameObject.SetActive(false);
+        DeathPanel.gameObject.SetActive(false);
     }
 
 }
