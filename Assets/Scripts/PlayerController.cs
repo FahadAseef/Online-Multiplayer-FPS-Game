@@ -66,7 +66,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         Cursor.lockState = CursorLockMode.Locked;
         Cam = Camera.main;
         UIcontroller.instance.WeaponTempSlider.maxValue = MaxHeat;
-        SwitchGun();
+        //SwitchGun();
+        photonView.RPC("SetGun", RpcTarget.All, SelectedGun);
         //Transform NewTransform = SpawnManager.instance.GetSpawnPoints();
         //transform.position = NewTransform.position;
         //transform.rotation = NewTransform.rotation;
@@ -213,7 +214,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 SelectedGun = 0;
             }
-            SwitchGun();
+            //SwitchGun();
+            photonView.RPC("SetGun", RpcTarget.All, SelectedGun);
         }
         else if(Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
@@ -222,7 +224,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 SelectedGun = AllGuns.Length - 1;
             }
-            SwitchGun();
+            //SwitchGun();
+            photonView.RPC("SetGun", RpcTarget.All, SelectedGun);
         }
     }
     private void SwitchGun()
@@ -241,7 +244,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if (Input.GetKeyDown((i + 1).ToString()))
             {
                 SelectedGun = i;
-                SwitchGun();
+                //SwitchGun();
+                photonView.RPC("SetGun", RpcTarget.All, SelectedGun);
             }
         }
     }
@@ -283,6 +287,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 PlayerSpawner.Instance.DieFN(damager);
             }
             UIcontroller.instance.HealthSlider.value = CurrentHealth;
+        }
+    }
+
+    [PunRPC]
+    public void SetGun(int guntoswitchto)
+    {
+        if (guntoswitchto < AllGuns.Length)
+        {
+            SelectedGun = guntoswitchto;
+            SwitchGun();
         }
     }
   
