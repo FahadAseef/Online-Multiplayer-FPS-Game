@@ -11,6 +11,8 @@ public class UIcontroller : MonoBehaviour
     public Slider WeaponTempSlider;
     public GameObject DeathPanel;
     public TMP_Text DeathText;
+    public Slider HealthSlider;
+    public TMP_Text healthText;
 
     private void Awake()
     {

@@ -157,6 +157,7 @@ MonoBehaviour:
   - {fileID: 2848073981608986275}
   MuzzleDisplayTime: 0.016666668
   PlayerHitImpact: {fileID: 2019052875574484730, guid: 818510087cd318c49b795b31ef8641ef, type: 3}
+  MaxHealth: 100
 --- !u!143 &2848073980658438129
 CharacterController:
   m_ObjectHideFlags: 0

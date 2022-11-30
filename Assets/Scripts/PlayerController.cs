@@ -65,6 +65,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         //transform.position = NewTransform.position;
         //transform.rotation = NewTransform.rotation;
         CurrentHealth=MaxHealth;
+        UIcontroller.instance.HealthSlider.maxValue = MaxHealth;
+        UIcontroller.instance.HealthSlider.value = CurrentHealth;
     }
 
 
@@ -257,12 +259,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             //Debug.Log(photonView.Owner.NickName + "has been hit  by" + damager);
-
             CurrentHealth -= damageAmount;
             if (CurrentHealth <= 0)
             {
                 PlayerSpawner.Instance.DieFN(damager);
             }
+            UIcontroller.instance.HealthSlider.value = CurrentHealth;
         }
     }
   
