@@ -160,6 +160,7 @@ MonoBehaviour:
   PlayerHitImpact: {fileID: 2019052875574484730, guid: 818510087cd318c49b795b31ef8641ef, type: 3}
   MaxHealth: 100
   Anime: {fileID: 2255507226910809570}
+  PlayerModel: {fileID: 2255507226959490041}
 --- !u!143 &2848073980658438129
 CharacterController:
   m_ObjectHideFlags: 0
@@ -527,6 +528,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Character
       objectReference: {fileID: 0}
+    - target: {fileID: 1046021142964596803, guid: 38074321d88bbe3438955d413494dac3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1046021142964628577, guid: 38074321d88bbe3438955d413494dac3, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -635,6 +640,11 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
+--- !u!1 &2255507226959490041 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1046021142964596803, guid: 38074321d88bbe3438955d413494dac3, type: 3}
+  m_PrefabInstance: {fileID: 1281587938367167418}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2848073980275707716
 PrefabInstance:
   m_ObjectHideFlags: 0

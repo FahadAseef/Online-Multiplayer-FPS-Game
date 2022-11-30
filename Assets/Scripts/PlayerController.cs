@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     //animation
     [SerializeField] Animator Anime;
+    [SerializeField] GameObject PlayerModel;
 
     void Start()
     {
@@ -68,8 +69,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         //transform.position = NewTransform.position;
         //transform.rotation = NewTransform.rotation;
         CurrentHealth=MaxHealth;
-        UIcontroller.instance.HealthSlider.maxValue = MaxHealth;
-        UIcontroller.instance.HealthSlider.value = CurrentHealth;
+        if (photonView.IsMine)
+        {
+            PlayerModel.SetActive(false);
+            UIcontroller.instance.HealthSlider.maxValue = MaxHealth;
+            UIcontroller.instance.HealthSlider.value = CurrentHealth;
+        }
     }
 
 
