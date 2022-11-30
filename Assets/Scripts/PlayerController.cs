@@ -55,6 +55,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField] int MaxHealth = 100;
     private int CurrentHealth;
 
+    //animation
+    [SerializeField] Animator Anime;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -116,6 +119,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             UIcontroller.instance.WeaponTempSlider.value = HeatCounter;
             WeaponScrolling();
             WeaponSwapWithNumPad();
+            Anime.SetBool("grounded", IsGrounded);
+            Anime.SetFloat("speed", MoveDirection.magnitude);
         }
     }
 
