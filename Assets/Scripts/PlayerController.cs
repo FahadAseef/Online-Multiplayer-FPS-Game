@@ -48,6 +48,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField] float MuzzleDisplayTime;
     private float MuzzleCounter;
 
+    //player impact
+    [SerializeField] GameObject PlayerHitImpact;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -151,9 +154,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
         ray.origin = Cam.transform.position;
         if (Physics.Raycast(ray, out Hit))
         {
-            Debug.Log(Hit.collider.gameObject.name);
-            BulleetImpactObject = Instantiate(BulletImpact, Hit.point + (Hit.normal*.002f), Quaternion.LookRotation(Hit.normal, Vector3.up));
-            Destroy(BulleetImpactObject,10f);
+            //Debug.Log(Hit.collider.gameObject.name);
+            if (Hit.collider.gameObject.tag == "Player")
+            {
+                Debug.Log(Hit.collider.gameObject.GetPhotonView().Owner.NickName);
+                PhotonNetwork.Instantiate(PlayerHitImpact.name, Hit.point, Quaternion.identity);
+            }
+            else
+            {
+                BulleetImpactObject = Instantiate(BulletImpact, Hit.point + (Hit.normal * .002f), Quaternion.LookRotation(Hit.normal, Vector3.up));
+                Destroy(BulleetImpactObject, 10f);
+            }
         }
         ShotCounter = AllGuns[SelectedGun].TimeBetweenShots;
 
