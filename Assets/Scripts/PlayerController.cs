@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     //player rotation
     [SerializeField] Transform ViewPoint;
@@ -61,48 +62,51 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        PlayerRotation();
-        PlayerMovement();
-        if (AllGuns[SelectedGun].MuzzleFlash.activeInHierarchy)
+        if (photonView.IsMine)
         {
-            MuzzleCounter -= Time.deltaTime;
-            if (MuzzleCounter <= 0)
+            PlayerRotation();
+            PlayerMovement();
+            if (AllGuns[SelectedGun].MuzzleFlash.activeInHierarchy)
             {
-                AllGuns[SelectedGun].MuzzleFlash.SetActive(false);
+                MuzzleCounter -= Time.deltaTime;
+                if (MuzzleCounter <= 0)
+                {
+                    AllGuns[SelectedGun].MuzzleFlash.SetActive(false);
+                }
             }
-        }
-        if (!OverHeated)
-        {
-            if (Input.GetMouseButtonDown(0))
+            if (!OverHeated)
             {
-                Shoot();
-            }
-            if (Input.GetMouseButton(0) && AllGuns[SelectedGun].IsAutomatic)
-            {
-                ShotCounter -= Time.deltaTime;
-                if (ShotCounter <= 0)
+                if (Input.GetMouseButtonDown(0))
                 {
                     Shoot();
                 }
+                if (Input.GetMouseButton(0) && AllGuns[SelectedGun].IsAutomatic)
+                {
+                    ShotCounter -= Time.deltaTime;
+                    if (ShotCounter <= 0)
+                    {
+                        Shoot();
+                    }
+                }
+                HeatCounter -= CoolRate * Time.deltaTime;
             }
-            HeatCounter -= CoolRate * Time.deltaTime;
-        }
-        else
-        {
-            HeatCounter-=OverHeatCoolRate* Time.deltaTime;
+            else
+            {
+                HeatCounter -= OverHeatCoolRate * Time.deltaTime;
+                if (HeatCounter < 0)
+                {
+                    OverHeated = false;
+                    UIcontroller.instance.OverheatMessagte.gameObject.SetActive(false);
+                }
+            }
             if (HeatCounter < 0)
             {
-                OverHeated = false;
-                UIcontroller.instance.OverheatMessagte.gameObject.SetActive(false);
+                HeatCounter = 0;
             }
+            UIcontroller.instance.WeaponTempSlider.value = HeatCounter;
+            WeaponScrolling();
+            WeaponSwapWithNumPad();
         }
-        if (HeatCounter < 0)
-        {
-            HeatCounter = 0;
-        }
-        UIcontroller.instance.WeaponTempSlider.value = HeatCounter;
-        WeaponScrolling();
-        WeaponSwapWithNumPad();
     }
 
     private void PlayerRotation()
@@ -207,8 +211,11 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        Cam.transform.position = ViewPoint.position;
-        Cam.transform.rotation = ViewPoint.rotation;
+        if (photonView.IsMine)
+        {
+            Cam.transform.position = ViewPoint.position;
+            Cam.transform.rotation = ViewPoint.rotation;
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
