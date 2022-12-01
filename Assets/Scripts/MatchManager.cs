@@ -75,10 +75,10 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
-    public void NewPlayerSend(string UserName)
+    public void NewPlayerSend(string username)
     {
         object[] Package = new object[4];
-        Package[0] = UserName;
+        Package[0] = username;
         Package[1] = PhotonNetwork.LocalPlayer.ActorNumber;
         Package[2] = 0;
         Package[3] = 0;
@@ -94,8 +94,8 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 
     public void NewPlayerRecieve(object[] DataRecieved)
     {
-        PlayerInfo Player = new PlayerInfo((string) DataRecieved[0],(int) DataRecieved[1],(int) DataRecieved[2],(int) DataRecieved[3]);
-        AllPlayers.Add(Player);
+        PlayerInfo player = new PlayerInfo((string) DataRecieved[0],(int) DataRecieved[1],(int) DataRecieved[2],(int) DataRecieved[3]);
+        AllPlayers.Add(player);
         ListPlayerSend();
     }
 
@@ -139,14 +139,40 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         }
     }
 
-    public void UpdateStatSend()
+    public void UpdateStatSend(int actorsending,int statetoupdate,int amounttochange)
     {
-
+        object[] package=new object[] {actorsending,statetoupdate,amounttochange};
+        PhotonNetwork.RaiseEvent(
+           (byte)EventCodes.UpdateStat,
+           package,
+           new RaiseEventOptions { Receivers = ReceiverGroup.All },
+           new SendOptions { Reliability = true }
+           );
     }
 
     public void UpdateStatRecieve(object[] DataRecieved)
     {
+        int actor = (int)DataRecieved[0];
+        int stattype = (int)DataRecieved[1];
+        int amount = (int)DataRecieved[2];
 
+        for(int i = 0; i < AllPlayers.Count; i++)
+        {
+            if (AllPlayers[i].Actor == actor)
+            {
+                switch (stattype)
+                {
+                    case 0: //kills
+                        AllPlayers[i].Kills += amount;
+                        break;
+                    case 1: //deaths
+                        AllPlayers[i].Death += amount;
+                        break;
+                }
+
+                break;
+            }
+        }
     }
 
 }
