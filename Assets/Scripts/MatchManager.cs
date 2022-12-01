@@ -9,7 +9,16 @@ using System;
 
 public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 {
-   public static MatchManager instance;
+    public static MatchManager instance;
+    public enum EventCodes : byte
+    {
+        NewPlayer,
+        ListPlayers,
+        ChangeStat
+    }
+    public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
+    private int Index;
+
 
     private void Awake()
     {
@@ -22,6 +31,11 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         {
             SceneManager.LoadScene(0);
         }
+    }
+
+    private void Update()
+    {
+       
     }
 
     public void OnEvent(EventData PhotonEvent)
@@ -37,6 +51,24 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
     public override void OnDisable()
     {
         PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
+}
+
+[System.Serializable]
+public class PlayerInfo
+{
+    public string Name;
+    public int Actor;
+    public int Kills;
+    public int Death;
+
+    public PlayerInfo(string _name, int _actor, int _kills, int _death)
+    {
+        _name = Name;
+        _actor = Actor;
+        _kills = Kills;
+        _death = Death;
     }
 
 }
