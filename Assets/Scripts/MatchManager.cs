@@ -31,6 +31,10 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         {
             SceneManager.LoadScene(0);
         }
+        else
+        {
+            NewPlayerSend(PhotonNetwork.NickName);
+        }
     }
 
     private void Update()
@@ -71,8 +75,20 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
-    public void NewPlayerSend()
+    public void NewPlayerSend(string UserName)
     {
+        object[] Package = new object[4];
+        Package[0] = UserName;
+        Package[1] = PhotonNetwork.LocalPlayer.ActorNumber;
+        Package[2] = 0;
+        Package[3] = 0;
+
+        PhotonNetwork.RaiseEvent(
+            (byte)EventCodes.NewPlayer,
+            Package,
+            new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient },
+            new SendOptions { Reliability = true }
+            );
 
     }
 
