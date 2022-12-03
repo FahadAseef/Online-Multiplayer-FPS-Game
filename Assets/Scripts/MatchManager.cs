@@ -5,7 +5,7 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using System;
+//using System;
 
 public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 {
@@ -54,14 +54,16 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         
     }
 
-    public void OnEvent(EventData PhotonEvent)
+    public void OnEvent(EventData photonEvent)
     {
-        if (PhotonEvent.Code < 200)
+        if (photonEvent.Code < 200)
         {
-            EventCodes TheEvent = (EventCodes)PhotonEvent.Code;
-            object[] data = (object[])PhotonEvent.CustomData;
+            EventCodes theEvent = (EventCodes)photonEvent.Code;
+            object[] data = (object[])photonEvent.CustomData;
 
-            switch (TheEvent)
+            Debug.Log("recieved event " + theEvent);            
+
+            switch (theEvent)
             {
                 case EventCodes.NewPlayer:
                     NewPlayerRecieve(data);
@@ -89,24 +91,24 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 
     public void NewPlayerSend(string username)
     {
-        object[] Package = new object[4];
-        Package[0] = username;
-        Package[1] = PhotonNetwork.LocalPlayer.ActorNumber;
-        Package[2] = 0;
-        Package[3] = 0;
+        object[] package = new object[4];
+        package[0] = username;
+        package[1] = PhotonNetwork.LocalPlayer.ActorNumber;
+        package[2] = 0;
+        package[3] = 0;
 
         PhotonNetwork.RaiseEvent(
             (byte)EventCodes.NewPlayer,
-            Package,
+            package,
             new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient },
             new SendOptions { Reliability = true }
             );
 
     }
 
-    public void NewPlayerRecieve(object[] DataRecieved)
+    public void NewPlayerRecieve(object[] dataRecieved)
     {
-        PlayerInfo player = new PlayerInfo((string) DataRecieved[0],(int) DataRecieved[1],(int) DataRecieved[2],(int) DataRecieved[3]);
+        PlayerInfo player = new PlayerInfo((string) dataRecieved[0],(int) dataRecieved[1],(int) dataRecieved[2],(int) dataRecieved[3]);
         AllPlayers.Add(player);
         ListPlayerSend();
     }
@@ -138,7 +140,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         {
             object[] piece = (object[])DataRecieved[i];
             PlayerInfo player = new PlayerInfo(
-                (String)piece[0],
+                (string)piece[0],
                 (int)piece[1],
                 (int)piece[2],
                 (int)piece[3]
@@ -187,6 +189,10 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
                 {
                     UpdateStatsDisplay();
                 }
+                if (UIcontroller.instance.LeaderBoard.activeInHierarchy)
+                {
+                    ShowLeaderBoard();
+                }
 
                 break;
             }
@@ -207,7 +213,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         }
     }
 
-    private void ShowLeaderBoard()
+    void ShowLeaderBoard()
     {
         UIcontroller.instance.LeaderBoard.SetActive(true);
         foreach(LeadeBoard lp in leaderboardplayers)
@@ -216,7 +222,10 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         }
         leaderboardplayers.Clear();
         UIcontroller.instance.LeaderBoardPlayerDisplay.gameObject.SetActive(false);
-        foreach(PlayerInfo player in AllPlayers)
+
+        List<PlayerInfo> sorted = sortPlayer(AllPlayers);
+
+        foreach(PlayerInfo player in sorted)
         {
             LeadeBoard newPlayerDisplay = Instantiate(UIcontroller.instance.LeaderBoardPlayerDisplay, UIcontroller.instance.LeaderBoardPlayerDisplay.transform.parent);
             newPlayerDisplay.SetDetails(player.Name, player.Kills, player.Death);
@@ -225,7 +234,32 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         }
     }
 
+    private List<PlayerInfo> sortPlayer(List<PlayerInfo> players)
+    {
+        List<PlayerInfo> sorted = new List<PlayerInfo>();
+        while (sorted.Count < players.Count)
+        {
+            int highest = -1;
+            PlayerInfo selectedPlayer = players[0];
+            foreach (PlayerInfo player in players)
+            {
+                if (sorted.Contains(player))
+                {
+                    if (player.Kills > highest)
+                    {
+                        selectedPlayer = player;
+                        highest = player.Kills;
+                    }
+                }
+            }
+            sorted.Add(selectedPlayer);
+        }
+
+        return sorted;
+    }
+
 }
+
 
 [System.Serializable]
 public class PlayerInfo
