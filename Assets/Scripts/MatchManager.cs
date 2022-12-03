@@ -18,6 +18,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
     }
     public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
     private int Index;
+    private List<LeadeBoard> leaderboardplayers = new List<LeadeBoard>();
 
 
     private void Awake()
@@ -39,7 +40,18 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 
     private void Update()
     {
-       
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (UIcontroller.instance.LeaderBoard.activeInHierarchy)
+            {
+                UIcontroller.instance.LeaderBoard.SetActive(false);
+            }
+            else
+            {
+                ShowLeaderBoard();
+            }
+        }
+        
     }
 
     public void OnEvent(EventData PhotonEvent)
@@ -109,7 +121,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             piece[1] = AllPlayers[i].Actor;
             piece[2] = AllPlayers[i].Kills;
             piece[3] = AllPlayers[i].Death;
-            package[i+1] = piece;
+            package[i] = piece;
         }
         PhotonNetwork.RaiseEvent(
             (byte)EventCodes.ListPlayers,
@@ -134,7 +146,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             AllPlayers.Add(player);
             if (PhotonNetwork.LocalPlayer.ActorNumber == player.Actor)
             {
-                Index = i-1;
+                Index = i;
             }
         }
     }
@@ -192,6 +204,24 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         {
             UIcontroller.instance.KillsText.text = "kills : 0";
             UIcontroller.instance.DeathsText.text = "Deaths : 0";
+        }
+    }
+
+    private void ShowLeaderBoard()
+    {
+        UIcontroller.instance.LeaderBoard.SetActive(true);
+        foreach(LeadeBoard lp in leaderboardplayers)
+        {
+            Destroy(lp.gameObject);
+        }
+        leaderboardplayers.Clear();
+        UIcontroller.instance.LeaderBoardPlayerDisplay.gameObject.SetActive(false);
+        foreach(PlayerInfo player in AllPlayers)
+        {
+            LeadeBoard newPlayerDisplay = Instantiate(UIcontroller.instance.LeaderBoardPlayerDisplay, UIcontroller.instance.LeaderBoardPlayerDisplay.transform.parent);
+            newPlayerDisplay.SetDetails(player.Name, player.Kills, player.Death);
+            newPlayerDisplay.gameObject.SetActive(true);
+            leaderboardplayers.Add(newPlayerDisplay);
         }
     }
 
