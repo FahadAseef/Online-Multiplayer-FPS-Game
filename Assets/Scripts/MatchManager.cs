@@ -5,6 +5,7 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using System;
 //using System;
 
 public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
@@ -171,6 +172,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 Index = i-1;
             }
         }
+        StateCheck();
     }
 
     public void UpdateStatSend(int actorsending, int statetoupdate, int amounttochange)
@@ -306,6 +308,34 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
+    void StateCheck()
+    {
+        if(state == GameState.Ending)
+        {
+            EndGame();
+        }
+    }
+
+    void EndGame()
+    {
+        state = GameState.Ending;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.DestroyAll();
+        }
+        UIcontroller.instance.EndScreen.SetActive(true);
+        ShowLeaderBoard();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        StartCoroutine(EndCo());
+    }
+
+    private IEnumerator EndCo()
+    {
+        yield return new WaitForSeconds(WaitAfterEnding);
+        PhotonNetwork.AutomaticallySyncScene = false;
+        PhotonNetwork.LeaveRoom();
+    }
 }
 
 
