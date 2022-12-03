@@ -7,9 +7,16 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 //using System;
 
-public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
+public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public static MatchManager instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
+
     public enum EventCodes : byte
     {
         NewPlayer,
@@ -20,11 +27,19 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
     private int Index;
     private List<LeadeBoard> leaderboardplayers = new List<LeadeBoard>();
 
-
-    private void Awake()
+    public enum GameState
     {
-        instance = this;
+        Waiting,
+        Playing,
+        Ending
     }
+
+    public int killsToWin = 3;
+    public Transform MapCamPoint;
+    public GameState state = GameState.Waiting;
+    public float WaitAfterEnding = 5;
+
+
 
     private void Start()
     {
@@ -35,12 +50,13 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         else
         {
             NewPlayerSend(PhotonNetwork.NickName);
+            state = GameState.Playing;
         }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) && state != GameState.Ending)
         {
             if (UIcontroller.instance.LeaderBoard.activeInHierarchy)
             {
@@ -51,7 +67,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
                 ShowLeaderBoard();
             }
         }
-        
+
     }
 
     public void OnEvent(EventData photonEvent)
@@ -61,7 +77,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             EventCodes theEvent = (EventCodes)photonEvent.Code;
             object[] data = (object[])photonEvent.CustomData;
 
-            Debug.Log("recieved event " + theEvent);            
+            Debug.Log("recieved event " + theEvent);
 
             switch (theEvent)
             {
@@ -108,22 +124,23 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 
     public void NewPlayerRecieve(object[] dataRecieved)
     {
-        PlayerInfo player = new PlayerInfo((string) dataRecieved[0],(int) dataRecieved[1],(int) dataRecieved[2],(int) dataRecieved[3]);
+        PlayerInfo player = new PlayerInfo((string)dataRecieved[0], (int)dataRecieved[1], (int)dataRecieved[2], (int)dataRecieved[3]);
         AllPlayers.Add(player);
         ListPlayerSend();
     }
 
     public void ListPlayerSend()
     {
-        object[] package = new object[AllPlayers.Count];
-        for(int i= 0; i < AllPlayers.Count; i++)
+        object[] package = new object[AllPlayers.Count + 1];
+        package[0] = state;
+        for (int i = 0; i < AllPlayers.Count; i++)
         {
             object[] piece = new object[4];
             piece[0] = AllPlayers[i].Name;
             piece[1] = AllPlayers[i].Actor;
             piece[2] = AllPlayers[i].Kills;
             piece[3] = AllPlayers[i].Death;
-            package[i] = piece;
+            package[i+1] = piece;
         }
         PhotonNetwork.RaiseEvent(
             (byte)EventCodes.ListPlayers,
@@ -136,7 +153,10 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
     public void ListPlayerRecieve(object[] DataRecieved)
     {
         AllPlayers.Clear();
-        for(int i= 0; i < DataRecieved.Length; i++)
+
+        state=(GameState)DataRecieved[0]; 
+
+        for (int i = 1; i < DataRecieved.Length; i++)
         {
             object[] piece = (object[])DataRecieved[i];
             PlayerInfo player = new PlayerInfo(
@@ -148,14 +168,14 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             AllPlayers.Add(player);
             if (PhotonNetwork.LocalPlayer.ActorNumber == player.Actor)
             {
-                Index = i;
+                Index = i-1;
             }
         }
     }
 
-    public void UpdateStatSend(int actorsending,int statetoupdate,int amounttochange)
+    public void UpdateStatSend(int actorsending, int statetoupdate, int amounttochange)
     {
-        object[] package=new object[] {actorsending,statetoupdate,amounttochange};
+        object[] package = new object[] { actorsending, statetoupdate, amounttochange };
         PhotonNetwork.RaiseEvent(
            (byte)EventCodes.UpdateStat,
            package,
@@ -170,7 +190,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         int stattype = (int)DataRecieved[1];
         int amount = (int)DataRecieved[2];
 
-        for(int i = 0; i < AllPlayers.Count; i++)
+        for (int i = 0; i < AllPlayers.Count; i++)
         {
             if (AllPlayers[i].Actor == actor)
             {
@@ -197,6 +217,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
                 break;
             }
         }
+        ScoreCheck();
     }
 
     public void UpdateStatsDisplay()
@@ -216,7 +237,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
     void ShowLeaderBoard()
     {
         UIcontroller.instance.LeaderBoard.SetActive(true);
-        foreach(LeadeBoard lp in leaderboardplayers)
+        foreach (LeadeBoard lp in leaderboardplayers)
         {
             Destroy(lp.gameObject);
         }
@@ -225,7 +246,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
 
         List<PlayerInfo> sorted = sortPlayer(AllPlayers);
 
-        foreach(PlayerInfo player in sorted)
+        foreach (PlayerInfo player in sorted)
         {
             LeadeBoard newPlayerDisplay = Instantiate(UIcontroller.instance.LeaderBoardPlayerDisplay, UIcontroller.instance.LeaderBoardPlayerDisplay.transform.parent);
             newPlayerDisplay.SetDetails(player.Name, player.Kills, player.Death);
@@ -258,7 +279,35 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
         return sorted;
     }
 
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        SceneManager.LoadScene(0);
+    }
+
+    void ScoreCheck()
+    {
+        bool WinnerFound = false;
+        foreach(PlayerInfo player in AllPlayers)
+        {
+            if (player.Kills >= killsToWin && killsToWin>0)
+            {
+                WinnerFound = true;
+                break;
+            }
+        }
+        if (WinnerFound)
+        {
+            if (PhotonNetwork.IsMasterClient && state != GameState.Ending)
+            {
+                state = GameState.Ending;
+                ListPlayerSend();
+            }
+        }
+    }
+
 }
+
 
 
 [System.Serializable]
