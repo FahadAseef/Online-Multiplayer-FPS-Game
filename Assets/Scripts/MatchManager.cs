@@ -169,9 +169,27 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
                         AllPlayers[i].Death += amount;
                         break;
                 }
+                if (i == Index)
+                {
+                    UpdateStatsDisplay();
+                }
 
                 break;
             }
+        }
+    }
+
+    public void UpdateStatsDisplay()
+    {
+        if (AllPlayers.Count > Index)
+        {
+            UIcontroller.instance.KillsText.text = "kills : " + AllPlayers[Index].Kills;
+            UIcontroller.instance.DeathsText.text = "Deaths : " + AllPlayers[Index].Death;
+        }
+        else
+        {
+            UIcontroller.instance.KillsText.text = "kills : 0";
+            UIcontroller.instance.DeathsText.text = "Deaths : 0";
         }
     }
 

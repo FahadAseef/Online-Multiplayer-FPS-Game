@@ -13,6 +13,8 @@ public class UIcontroller : MonoBehaviour
     public TMP_Text DeathText;
     public Slider HealthSlider;
     public TMP_Text healthText;
+    public TMP_Text KillsText;
+    public TMP_Text DeathsText;
 
     private void Awake()
     {
