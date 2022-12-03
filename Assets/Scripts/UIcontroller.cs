@@ -17,6 +17,7 @@ public class UIcontroller : MonoBehaviour
     public TMP_Text DeathsText;
     public GameObject LeaderBoard;
     public LeadeBoard LeaderBoardPlayerDisplay;
+    public GameObject EndScreen;
 
     private void Awake()
     {
