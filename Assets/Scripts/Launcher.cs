@@ -25,7 +25,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     private List<TMP_Text> AllPlayerLabels=new List<TMP_Text>();
     [SerializeField] GameObject NameInputPanel;
     [SerializeField] TMP_InputField PlayerNameInput;
-    private bool HasSetNickName;
+    public static bool HasSetNickName;
     public string LevelToPlay;
     [SerializeField] GameObject StartButton;
     [SerializeField] GameObject RoomTestButton;
@@ -44,6 +44,10 @@ public class Launcher : MonoBehaviourPunCallbacks
 #if UNITY_EDITOR
         RoomTestButton.SetActive(true);
 #endif
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
     }
   
     private void CloseMenus()
