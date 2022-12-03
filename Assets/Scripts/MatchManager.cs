@@ -109,7 +109,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             piece[1] = AllPlayers[i].Actor;
             piece[2] = AllPlayers[i].Kills;
             piece[3] = AllPlayers[i].Death;
-            package[i] = piece;
+            package[i+1] = piece;
         }
         PhotonNetwork.RaiseEvent(
             (byte)EventCodes.ListPlayers,
@@ -134,7 +134,7 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
             AllPlayers.Add(player);
             if (PhotonNetwork.LocalPlayer.ActorNumber == player.Actor)
             {
-                Index = i;
+                Index = i-1;
             }
         }
     }
@@ -164,9 +164,11 @@ public class MatchManager : MonoBehaviourPunCallbacks,IOnEventCallback
                 {
                     case 0: //kills
                         AllPlayers[i].Kills += amount;
+                        Debug.Log("Player " + AllPlayers[i].Name + " : kills " + AllPlayers[i].Kills);
                         break;
                     case 1: //deaths
                         AllPlayers[i].Death += amount;
+                        Debug.Log("Player " + AllPlayers[i].Name + " : deaths " + AllPlayers[i].Death);
                         break;
                 }
                 if (i == Index)
