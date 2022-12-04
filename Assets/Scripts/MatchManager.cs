@@ -5,7 +5,7 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using System;
+//using System;
 //using System;
 
 public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
@@ -27,7 +27,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
     public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
     private int Index;
-    public EventCodes theEvent;
+    //public EventCodes theEvent;
     private List<LeadeBoard> leaderboardplayers = new List<LeadeBoard>();
 
     public enum GameState
@@ -353,7 +353,22 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                NextMatchSend();
+                if (!Launcher.Instance.changeMapsBetweenRounds)
+                {
+                    NextMatchSend();
+                }
+                else
+                {
+                    int newlevel=Random.Range(0, Launcher.Instance.allMaps.Length);
+                    if (Launcher.Instance.allMaps[newlevel] == SceneManager.GetActiveScene().name)
+                    {
+                        NextMatchSend();
+                    }
+                    else
+                    {
+                        PhotonNetwork.LoadLevel(Launcher.Instance.allMaps[newlevel]);
+                    }
+                }
             }
         }
     }

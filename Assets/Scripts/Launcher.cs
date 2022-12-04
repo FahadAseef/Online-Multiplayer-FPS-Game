@@ -29,6 +29,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     public string LevelToPlay;
     [SerializeField] GameObject StartButton;
     [SerializeField] GameObject RoomTestButton;
+    public string[] allMaps;
+    public bool changeMapsBetweenRounds=true;
 
     private void Awake()
     {
@@ -240,7 +242,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(LevelToPlay);
+        // PhotonNetwork.LoadLevel(LevelToPlay);
+        PhotonNetwork.LoadLevel(allMaps[Random.Range(0,allMaps.Length)]);
     }
 
     public override void OnMasterClientSwitched(Player newMasterClient)
