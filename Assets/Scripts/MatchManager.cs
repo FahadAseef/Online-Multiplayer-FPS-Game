@@ -27,6 +27,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
     public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
     private int Index;
+    public EventCodes theEvent;
     private List<LeadeBoard> leaderboardplayers = new List<LeadeBoard>();
 
     public enum GameState
