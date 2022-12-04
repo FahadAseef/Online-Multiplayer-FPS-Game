@@ -61,6 +61,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Transform ModelGunPoint;
     public Transform GunHolder;
 
+    //skins
+    public Material[] allSkins;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -84,6 +87,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             GunHolder.localPosition = Vector3.zero;
             GunHolder.localRotation = Quaternion.identity;
         }
+
+        PlayerModel.GetComponent<Renderer>().material = allSkins[photonView.Owner.ActorNumber%allSkins.Length];
     }
 
 
