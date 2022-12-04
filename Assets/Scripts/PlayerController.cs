@@ -64,6 +64,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
     //skins
     public Material[] allSkins;
 
+    public float adsSpeed=5;
+    public Transform adsInpoint;
+    public Transform adsOutpoint;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -140,6 +144,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
             WeaponSwapWithNumPad();
             Anime.SetBool("grounded", IsGrounded);
             Anime.SetFloat("speed", MoveDirection.magnitude);
+
+            if (Input.GetMouseButton(1))
+            {
+                Cam.fieldOfView = Mathf.Lerp(Cam.fieldOfView,AllGuns[SelectedGun].adsZoom,adsSpeed*Time.deltaTime);
+                GunHolder.position = Vector3.Lerp(GunHolder.position, adsInpoint.position, adsSpeed * Time.deltaTime);            }
+            else
+            {
+                Cam.fieldOfView = Mathf.Lerp(Cam.fieldOfView, 60f, adsSpeed * Time.deltaTime);
+                GunHolder.position = Vector3.Lerp(GunHolder.position, adsOutpoint.position, adsSpeed * Time.deltaTime);
+            }
         }
     }
 
@@ -270,6 +284,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 Cam.transform.rotation = MatchManager.instance.MapCamPoint.rotation;
             }
         }
+
+        
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;

@@ -9,4 +9,5 @@ public class Gun : MonoBehaviour
     public float HeatPerShot=1f;
     public GameObject MuzzleFlash;
     public int ShotDamage;
+    public float adsZoom;
 }
