@@ -22,7 +22,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         NewPlayer,
         ListPlayers,
-        UpdateStat
+        UpdateStat,
+        NextMatch
     }
     public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
     private int Index;
@@ -39,6 +40,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Transform MapCamPoint;
     public GameState state = GameState.Waiting;
     public float WaitAfterEnding = 5;
+
+    public bool Perpetual;
 
 
 
@@ -78,7 +81,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
             EventCodes theEvent = (EventCodes)photonEvent.Code;
             object[] data = (object[])photonEvent.CustomData;
 
-            Debug.Log("recieved event " + theEvent);
+           // Debug.Log("recieved event " + theEvent);
 
             switch (theEvent)
             {
@@ -90,6 +93,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
                     break;
                 case EventCodes.UpdateStat:
                     UpdateStatRecieve(data);
+                    break;
+                case EventCodes.NextMatch:
+                    NextMatchRecieve();
                     break;
 
             }
@@ -337,8 +343,44 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     private IEnumerator EndCo()
     {
         yield return new WaitForSeconds(WaitAfterEnding);
-        PhotonNetwork.AutomaticallySyncScene = false;
-        PhotonNetwork.LeaveRoom();
+        if (!Perpetual)
+        {
+            PhotonNetwork.AutomaticallySyncScene = false;
+            PhotonNetwork.LeaveRoom();
+        }
+        else
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                NextMatchSend();
+            }
+        }
+    }
+
+    public void NextMatchSend()
+    {
+        PhotonNetwork.RaiseEvent(
+         (byte)EventCodes.NextMatch,
+         null,
+         new RaiseEventOptions { Receivers = ReceiverGroup.All },
+         new SendOptions { Reliability = true }
+         );
+    }
+
+    public void NextMatchRecieve()
+    {
+        state = GameState.Playing;
+        UIcontroller.instance.EndScreen.SetActive(false);
+        UIcontroller.instance.LeaderBoard.SetActive(false);
+
+        foreach(PlayerInfo player in AllPlayers)
+        {
+            player.Kills = 0;
+            player.Death = 0;
+        }
+
+        UpdateStatsDisplay();
+        PlayerSpawner.Instance.SpawnPlayerFN();
     }
 }
 

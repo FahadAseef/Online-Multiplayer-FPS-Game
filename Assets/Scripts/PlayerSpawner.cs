@@ -33,7 +33,7 @@ public class PlayerSpawner : MonoBehaviour
     public void DieFN(string Damager)
     {       
         UIcontroller.instance.DeathText.text = "You were killed by " + Damager;
-        MatchManager.instance.UpdateStatSend(PhotonNetwork.LocalPlayer.ActorNumber, 1, 1);
+        MatchManager.instance.UpdateStatSend(PhotonNetwork.LocalPlayer.ActorNumber, 1, 1);  
         if (Player != null)
         {
             StartCoroutine(DieCo());
@@ -46,10 +46,14 @@ public class PlayerSpawner : MonoBehaviour
     {
         PhotonNetwork.Instantiate(DeathEffect.name, Player.transform.position, Quaternion.identity);
         PhotonNetwork.Destroy(Player);
+        Player = null;
         UIcontroller.instance.DeathPanel.SetActive(true);
         yield return new WaitForSeconds(RespawnTime);
-        SpawnPlayerFN();
         UIcontroller.instance.DeathPanel.SetActive(false);
+        if (MatchManager.instance.state == MatchManager.GameState.Playing && Player == null)
+        {
+            SpawnPlayerFN();
+        }
     }
 
 }
