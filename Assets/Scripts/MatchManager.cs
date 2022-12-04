@@ -23,7 +23,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
         NewPlayer,
         ListPlayers,
         UpdateStat,
-        NextMatch
+        NextMatch,
+        TimerSync
     }
     public List<PlayerInfo> AllPlayers = new List<PlayerInfo>();
     private int Index;
@@ -46,6 +47,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public float matchLength=180f;
     private float currentMatchTime;
+    private float sendTimer;
 
 
 
@@ -60,6 +62,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
             NewPlayerSend(PhotonNetwork.NickName);
             state = GameState.Playing;
             SetupTimer();
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                UIcontroller.instance.timerTect.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -76,22 +82,38 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 ShowLeaderBoard();
             }
         }
-        if (currentMatchTime > 0f && state == GameState.Playing) 
+      
+        if (PhotonNetwork.IsMasterClient)
         {
-            currentMatchTime -= Time.deltaTime;
-            if (currentMatchTime <= 0f)
+            if (currentMatchTime > 0f && state == GameState.Playing)
             {
-                currentMatchTime = 0f;
-                state = GameState.Ending;
-                if (PhotonNetwork.IsMasterClient)
+                currentMatchTime -= Time.deltaTime;
+
+                if (currentMatchTime <= 0f)
                 {
+                    currentMatchTime = 0f;
+
+                    state = GameState.Ending;
+
                     ListPlayerSend();
+
                     StateCheck();
                 }
-            }
-            updateTimerDisplay();
-        }
 
+                updateTimerDisplay();
+
+                sendTimer -= Time.time;
+                if (sendTimer <= 0)
+                {
+                    sendTimer += 1f;
+                    TimerSend();
+                }             
+            }
+
+
+
+
+        }
     }
 
     public void OnEvent(EventData photonEvent)
@@ -116,6 +138,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
                     break;
                 case EventCodes.NextMatch:
                     NextMatchRecieve();
+                    break;
+                case EventCodes.TimerSync:
+                    TimerRecieve(data);
                     break;
 
             }
@@ -432,6 +457,26 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         var timeToDisplay=System.TimeSpan.FromSeconds(currentMatchTime);
         UIcontroller.instance.timerTect.text=timeToDisplay.Minutes.ToString("00")+":" +timeToDisplay.Seconds.ToString("00") ;
+    }
+
+    public void TimerSend()
+    {
+        object[] package = new object[] {(int)currentMatchTime,state};
+
+        PhotonNetwork.RaiseEvent(
+         (byte)EventCodes.TimerSync,
+         package,
+         new RaiseEventOptions { Receivers = ReceiverGroup.All },
+         new SendOptions { Reliability = true }
+         );
+    }
+
+    public void TimerRecieve(object[] dataRecieved)
+    {
+        currentMatchTime = (int)dataRecieved[0];
+        state = (GameState)dataRecieved[1];
+        updateTimerDisplay() ;  
+        UIcontroller.instance.timerTect.gameObject.SetActive(true);
     }
 }
 
