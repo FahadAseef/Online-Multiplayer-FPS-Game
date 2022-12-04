@@ -139,7 +139,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ViewPoint: {fileID: 2848073981807021395}
   MouseSensitivity: 2
+  VerticalRotationStore: 0
+  MouseInput: {x: 0, y: 0}
   MoveSpeed: 5
+  MoveDirection: {x: 0, y: 0, z: 0}
+  Movement: {x: 0, y: 0, z: 0}
   CharController: {fileID: 2848073980658438129}
   RunSpeed: 8
   JumpForce: 12

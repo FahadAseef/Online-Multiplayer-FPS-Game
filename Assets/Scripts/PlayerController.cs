@@ -1,42 +1,42 @@
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using UnityEngine;
 using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
     //player rotation
-    [SerializeField] Transform ViewPoint;
-    [SerializeField] float MouseSensitivity=1f;
-    private float VerticalRotationStore;
-    private Vector2 MouseInput;
+    public Transform ViewPoint;
+    public float MouseSensitivity=1f;
+    public float VerticalRotationStore;
+    public Vector2 MouseInput;
 
     //player movement
-    [SerializeField] float MoveSpeed=5f;
-    private Vector3 MoveDirection;
-    private Vector3 Movement;
-    [SerializeField] CharacterController CharController;
-    [SerializeField] float RunSpeed=8f;
+    public float MoveSpeed=5f;
+    public Vector3 MoveDirection;
+    public Vector3 Movement;
+    public CharacterController CharController;
+    public float RunSpeed=8f;
     private float ActiveMoveSpeed;
     private Camera Cam;
-    [SerializeField] float JumpForce=7.5f;
-    [SerializeField] float GravityMod=2.5f;
-    [SerializeField] Transform GroundCheckPoint;
+    public float JumpForce=7.5f;
+    public float GravityMod=2.5f;
+    public Transform GroundCheckPoint;
     private bool IsGrounded;
-    [SerializeField] LayerMask GroundLayer;
+    public LayerMask GroundLayer;
 
     //player shooting
     private RaycastHit Hit;
-    [SerializeField] GameObject BulletImpact;
+    public GameObject BulletImpact;
     private GameObject BulleetImpactObject;
     private float ShotCounter;
 
     //shooting overheat
-    [SerializeField] float MaxHeat=10f;
-    [SerializeField] float CoolRate = 4f;
-    [SerializeField] float OverHeatCoolRate = 5f;
+    public float MaxHeat=10f;
+    public float CoolRate = 4f;
+    public float OverHeatCoolRate = 5f;
     private float HeatCounter;
     private bool OverHeated;
 
@@ -45,21 +45,21 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private int SelectedGun;
 
     //muzzle flash
-    [SerializeField] float MuzzleDisplayTime;
+    public float MuzzleDisplayTime;
     private float MuzzleCounter;
 
     //player impact
-    [SerializeField] GameObject PlayerHitImpact;
+    public GameObject PlayerHitImpact;
 
     //player health
-    [SerializeField] int MaxHealth = 100;
+    public int MaxHealth = 100;
     private int CurrentHealth;
 
     //animation
-    [SerializeField] Animator Anime;
-    [SerializeField] GameObject PlayerModel;
-    [SerializeField] Transform ModelGunPoint;
-    [SerializeField] Transform GunHolder;
+    public Animator Anime;
+    public GameObject PlayerModel;
+    public Transform ModelGunPoint;
+    public Transform GunHolder;
 
     void Start()
     {
@@ -292,6 +292,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             CurrentHealth -= damageAmount;
             if (CurrentHealth <= 0)
             {
+                CurrentHealth = 0;
                 PlayerSpawner.Instance.DieFN(damager);
                 MatchManager.instance.UpdateStatSend(actor, 0, 1);
             }

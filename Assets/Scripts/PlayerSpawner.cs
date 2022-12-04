@@ -9,7 +9,7 @@ public class PlayerSpawner : MonoBehaviour
     public GameObject PlayerPrefab;
     private GameObject Player;
     public GameObject DeathEffect;
-    [SerializeField] float RespawnTime=3f;
+    public float RespawnTime=3f;
 
     private void Awake()
     {

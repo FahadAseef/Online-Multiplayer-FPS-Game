@@ -4,31 +4,31 @@ using UnityEngine;
 using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
-using System.Linq;
+//using System.Linq;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public static Launcher Instance;
-    [SerializeField] GameObject LoadingScreen;
-    [SerializeField] TMP_Text LoadingText;
-    [SerializeField] GameObject MenuButtons;
-    [SerializeField] GameObject CreateRoomPanel;
-    [SerializeField] TMP_InputField RoomNameInput;
-    [SerializeField] GameObject RoomPanel;
-    [SerializeField] TMP_Text RoomNameText;
-    [SerializeField] GameObject ErrorPanel;
-    [SerializeField] TMP_Text ErrorText;
-    [SerializeField] GameObject RoomBrowserPanel;
+    public GameObject LoadingScreen;
+    public TMP_Text LoadingText;
+    public GameObject MenuButtons;
+    public GameObject CreateRoomPanel;
+    public TMP_InputField RoomNameInput;
+    public GameObject RoomPanel;
+    public TMP_Text RoomNameText;
+    public GameObject ErrorPanel;
+    public TMP_Text ErrorText;
+    public GameObject RoomBrowserPanel;
     public RoomButton TheRoomButton;
     private List<RoomButton> AllroomButtons = new List<RoomButton>();
-    [SerializeField] TMP_Text PlayerLabel;
+    public TMP_Text PlayerLabel;
     private List<TMP_Text> AllPlayerLabels=new List<TMP_Text>();
-    [SerializeField] GameObject NameInputPanel;
-    [SerializeField] TMP_InputField PlayerNameInput;
+    public GameObject NameInputPanel;
+    public TMP_InputField PlayerNameInput;
     public static bool HasSetNickName;
     public string LevelToPlay;
-    [SerializeField] GameObject StartButton;
-    [SerializeField] GameObject RoomTestButton;
+    public GameObject StartButton;
+    public GameObject RoomTestButton;
     public string[] allMaps;
     public bool changeMapsBetweenRounds=true;
 
@@ -41,7 +41,10 @@ public class Launcher : MonoBehaviourPunCallbacks
         CloseMenus();
         LoadingScreen.SetActive(true);
         LoadingText.text = "Conecting To Network...";
-        PhotonNetwork.ConnectUsingSettings();
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+        }
 
 #if UNITY_EDITOR
         RoomTestButton.SetActive(true);
