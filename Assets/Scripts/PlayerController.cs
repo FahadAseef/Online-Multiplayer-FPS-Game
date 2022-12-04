@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Transform adsInpoint;
     public Transform adsOutpoint;
 
+    public AudioSource footStepSlow;
+    public AudioSource footStepFast;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -172,11 +175,28 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (Input.GetKey(KeyCode.LeftShift))
         {
             ActiveMoveSpeed = RunSpeed;
+            if (!footStepFast.isPlaying && MoveDirection != Vector3.zero)
+            {
+                footStepFast.Play();
+                footStepSlow.Stop();
+            }
         }
         else
         {
             ActiveMoveSpeed = MoveSpeed;
+            if (!footStepSlow.isPlaying && MoveDirection != Vector3.zero)
+            {
+                footStepSlow.Play();
+                footStepFast.Stop();
+            }
         }
+
+        if (MoveDirection == Vector3.zero || !IsGrounded) 
+        {
+            footStepSlow.Stop();
+            footStepFast.Stop();
+        }
+
         float yVel = Movement.y;
         Movement = ((transform.forward * MoveDirection.z)+(transform.right*MoveDirection.x)).normalized*ActiveMoveSpeed;
         Movement.y = yVel;
@@ -223,6 +243,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
         AllGuns[SelectedGun].MuzzleFlash.SetActive(true);
         MuzzleCounter = MuzzleDisplayTime;
+
+        AllGuns[SelectedGun].shotSound.Stop();
+        AllGuns[SelectedGun].shotSound.Play();
     }
     private void WeaponScrolling()
     {
