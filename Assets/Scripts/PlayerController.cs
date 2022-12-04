@@ -271,7 +271,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
         else if(Cursor.lockState== CursorLockMode.None)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !UIcontroller.instance.OptionsScreen.activeInHierarchy) 
             {
                 Cursor.lockState= CursorLockMode.Locked;
             }

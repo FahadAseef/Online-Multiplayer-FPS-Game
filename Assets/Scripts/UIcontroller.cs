@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class UIcontroller : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class UIcontroller : MonoBehaviour
     public GameObject EndScreen;
     public TMP_Text timerTect;
 
+    public GameObject OptionsScreen;
+
+
     private void Awake()
     {
         instance = this;
@@ -28,6 +32,42 @@ public class UIcontroller : MonoBehaviour
     {
         OverheatMessagte.gameObject.SetActive(false);
         DeathPanel.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowHideOptions();
+        }
+        if (OptionsScreen.activeInHierarchy && Cursor.lockState!=CursorLockMode.None)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
+    public void ShowHideOptions()
+    {
+        if (!OptionsScreen.activeInHierarchy)
+        {
+            OptionsScreen.SetActive(true);
+        }
+        else
+        {
+            OptionsScreen.SetActive(false);
+        }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        PhotonNetwork.AutomaticallySyncScene = false;
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();  
     }
 
 }
